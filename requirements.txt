@@ -1,4 +1,8 @@
+starlette
 fastapi
+uvicorn
+watchfiles
+python-multipart
 numpy
 pillow
 sqlalchemy

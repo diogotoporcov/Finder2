@@ -1,3 +1,4 @@
+import datetime
 import uuid
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
@@ -17,8 +18,15 @@ class UploadSession(Base):
         index=True
     )
 
-    temp_path = sa.Column(sa.Text, nullable=False)
-    original_filename = sa.Column(sa.Text, nullable=True)
-    mime_type = sa.Column(sa.Text, nullable=False)
+    temp_name = sa.Column(sa.Text, nullable=False)
+    original_filename = sa.Column(sa.String(256), nullable=True)  # {original_name}.{ext}
+    mime_type = sa.Column(sa.String(100), nullable=False)  # e.g. "image/png"
     size_bytes = sa.Column(sa.BigInteger, nullable=False)
+
     created_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False)
+
+    expires_at = sa.Column(
+        sa.DateTime(timezone=True),
+        default=lambda: datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=5*60),
+        nullable=False
+    )
