@@ -10,7 +10,7 @@ from PIL import Image
 
 import clip
 
-from app.utils.types import DeviceType
+from finder.utils.types import DeviceType
 
 
 @dataclass(frozen=True)
