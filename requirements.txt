@@ -1,9 +1,9 @@
 fastapi
 numpy
-
 pillow
+sqlalchemy
+pgvector
 
-# Embeddings
 --extra-index-url https://download.pytorch.org/whl/cu128
 torch==2.8.0+cu128
 torchvision==0.23.0+cu128
