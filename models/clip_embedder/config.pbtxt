@@ -1,0 +1,29 @@
+name: "clip_embedder"
+platform: "onnxruntime_onnx"
+max_batch_size: 512
+
+input {
+  name: "INPUT"
+  data_type: TYPE_FP32
+  dims: 3
+  dims: 224
+  dims: 224
+}
+
+output {
+  name: "EMBEDDING"
+  data_type: TYPE_FP32
+  dims: 512
+}
+
+dynamic_batching {
+  preferred_batch_size: 64
+  preferred_batch_size: 128
+  preferred_batch_size: 256
+  max_queue_delay_microseconds: 2000
+}
+
+instance_group {
+  kind: KIND_GPU
+  count: 1
+}

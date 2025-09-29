@@ -23,14 +23,17 @@ class Image(Base):
         index=True
     )
 
-    stored_filename = sa.Column(sa.String(40), nullable=False)  # {image.id}.enc
-    original_filename = sa.Column(sa.String(256), nullable=True)  # {original_name}.{ext}
-    mime_type = sa.Column(sa.String(100), nullable=False)  # e.g. "image/png"
+    stored_filename = sa.Column(sa.String(40), nullable=False)
+    original_filename = sa.Column(sa.String(256), nullable=True)
+    mime_type = sa.Column(sa.String(100), nullable=False)
     size_bytes = sa.Column(sa.BigInteger, nullable=False)
 
     encryption_metadata = sa.Column(sa.JSON, nullable=False, server_default=sa.text("'{}'::jsonb"))
-
     tags = sa.Column(sa.ARRAY(sa.String), nullable=False, server_default="{}")
+
+    # novos campos para busca eficiente
+    sha256 = sa.Column(sa.String(64), unique=True, index=True, nullable=False)
+    phash = sa.Column(sa.BigInteger, index=True, nullable=False)
 
     embedding = sa.Column(Vector(512), nullable=False)
 
