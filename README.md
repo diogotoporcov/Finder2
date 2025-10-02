@@ -1,3 +1,7 @@
+# PROJECT IS STILL UNDER DEVELOPMENT, READ ME WILL BE AVAILABLE SOON.
+
+---
+
 ```bash
 python -m alembic revision --autogenerate -m "init"
 ```
