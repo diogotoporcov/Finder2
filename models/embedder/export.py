@@ -6,10 +6,11 @@ import clip
 
 from finder.utils.types import DeviceType
 
-path = Path("./models/clip_embedder/1/model.onnx")
+path = Path("./models/embedder/1/model.onnx")
 
 device = DeviceType.AUTO
 model, preprocess = clip.load("ViT-B/32", device=device)
+model.float()
 model.eval()
 
 

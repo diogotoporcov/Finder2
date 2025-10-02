@@ -1,4 +1,4 @@
-name: "clip_embedder"
+name: "embedder"
 platform: "onnxruntime_onnx"
 max_batch_size: 512
 
