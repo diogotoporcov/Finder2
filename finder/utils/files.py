@@ -34,16 +34,20 @@ async def write_files(files: List[Tuple[UploadFile, Path]], max_file_size: int) 
     return await asyncio.gather(*tasks)
 
 
-async def delete_file(path: Path):
+async def delete_file(path: Path) -> bool:
     try:
         await aiofiles.os.remove(path)
+        return True
 
     except FileNotFoundError:
-        pass
+        return True
+
+    except Exception:
+        return False
 
 
-async def delete_files(paths: List[Path]):
-    await asyncio.gather(*[delete_file(p) for p in paths])
+async def delete_files(paths: List[Path]) -> List[bool]:
+    return await asyncio.gather(*(delete_file(p) for p in paths))
 
 
 async def load_image_from_bytes(b: bytes) -> Image.Image:

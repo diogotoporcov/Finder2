@@ -1,4 +1,3 @@
-import asyncio
 import os
 from dataclasses import dataclass
 from typing import List
@@ -14,7 +13,7 @@ from finder.utils.preprocess import preprocess_many
 
 TRITON_URL = os.getenv("TRITON_URL", "localhost:8001")
 MODEL_NAME = os.getenv("TRITON_MODEL", "embedder")
-INPUT_NAME = os.getenv("TRITON_INPUT", "INPUT")        # FP32 [N,3,224,224]
+INPUT_NAME = os.getenv("TRITON_INPUT", "INPUT")  # FP32 [N,3,224,224]
 OUTPUT_NAME = os.getenv("TRITON_OUTPUT", "EMBEDDING")  # FP32 [N,512]
 
 

@@ -12,6 +12,12 @@ class UploadSession(Base):
 
     id = sa.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
+    owner_id = sa.Column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
     created_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False)
 
     expires_at = sa.Column(

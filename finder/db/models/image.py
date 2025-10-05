@@ -10,6 +10,12 @@ class Image(Base):
 
     id = sa.Column(sa.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
+    owner_id = sa.Column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
     # If null, image is temporary (From upload session).
     collection_id = sa.Column(
         sa.UUID(as_uuid=True),
@@ -27,7 +33,7 @@ class Image(Base):
 
     sha256 = sa.Column(sa.String(64), index=True, nullable=False)
     phash = sa.Column(sa.LargeBinary(8), index=True, nullable=False)
-    embedding = sa.Column(Vector(512), nullable=False)
+    embedding = sa.Column(Vector(512), nullable=True)
 
     created_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False)
     updated_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False)

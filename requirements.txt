@@ -3,6 +3,7 @@ psycopg2
 aiofiles
 imagehash
 pydantic
+pydantic[email]
 starlette
 fastapi
 uvicorn
@@ -23,3 +24,7 @@ tritonclient[grpc]
 onnx
 onnxscript
 onnxruntime
+
+python-jose[cryptography]
+argon2-cffi
+pyjwt
