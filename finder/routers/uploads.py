@@ -42,8 +42,9 @@ async def upload_files(
 
     file_ids = [uuid.uuid4() for _ in files]
     filenames = [
-        str(Path(file.filename).with_stem(str(id_)))
-        for file, id_ in zip(files, file_ids)
+        Path(file.filename).with_stem(str(id_))
+        for file, id_
+        in zip(files, file_ids)
     ]
 
     bytes_list = await UploadService.upload_files(session_id, files, filenames)

@@ -7,7 +7,7 @@ from fastapi import UploadFile, HTTPException, status
 
 from finder.utils.files import write_files, delete_files, FileTooLargeError
 
-ALLOWED_EXTENSIONS = set(os.getenv("ALLOWED_EXTENSIONS", "jpg,jpeg,png,webp,gif,bmp,tif,tiff").split(","))
+ALLOWED_EXTENSIONS = set(os.getenv("ALLOWED_EXTENSIONS", "jpg,jpeg,png,webp,bmp,tif,tiff").split(","))
 TMP_ROOT = Path(os.getenv("TMP_ROOT", "tmp/uploads"))
 MAX_FILE_SIZE = int(os.getenv("MAX_FILE_SIZE", 10 * 1024 * 1024))
 
@@ -17,7 +17,7 @@ class UploadService:
     async def upload_files(
             session_id: uuid.UUID,
             files: List[UploadFile],
-            filenames: List[str]
+            filenames: List[Path]
     ) -> List[bytes]:
         if len(files) != len(filenames):
             raise ValueError("Length of files and names must match.")
@@ -27,7 +27,7 @@ class UploadService:
 
         paths: List[Tuple[UploadFile, Path]] = []
         for file, filename in zip(files, filenames):
-            suffix = Path(file.filename).suffix.lower().lstrip(".")
+            suffix = filename.suffix.lower().lstrip(".")
             if suffix not in ALLOWED_EXTENSIONS:
                 raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Unsupported file type: {suffix}.")
 
