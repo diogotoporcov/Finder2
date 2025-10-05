@@ -8,8 +8,8 @@ from finder.services.embedding_service import EmbeddingService
 
 
 @contextlib.asynccontextmanager
-async def lifespan(app: FastAPI):
-    app.state.embedder = await run_in_threadpool(EmbeddingService.get_instance)
+async def lifespan(_app: FastAPI):
+    await run_in_threadpool(EmbeddingService.get_instance)
     yield
 
 
