@@ -16,6 +16,7 @@ class Collection(Base):
 
     name = sa.Column(sa.String, nullable=False)
     tags = sa.Column(sa.ARRAY(sa.String), nullable=False, server_default=sa.text("'{}'::text[]"))
+    is_default = sa.Column(sa.Boolean, nullable=False, server_default=sa.text("false"))
 
     created_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False)
     updated_at = sa.Column(sa.DateTime(timezone=True), server_default=sa.func.now(), onupdate=sa.func.now(), nullable=False)

@@ -1,12 +1,13 @@
 import uuid
 from itertools import repeat
 from pathlib import Path
-from typing import List
+from typing import List, Literal
 
 from fastapi import APIRouter, UploadFile, File, Depends, Query, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette import status
+from starlette.status import HTTP_200_OK
 
 from finder.db.models.image import Image
 from finder.db.models.upload_session import UploadSession, UploadSessionImage
@@ -96,3 +97,14 @@ async def upload_files(
     except Exception:
         db.rollback()
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class UploadPayload(BaseModel):
+    upload_id: uuid.UUID
+    collection_id: uuid.UUID | Literal["DEFAULT"]
+
+
+@router.post("/save", status_code=HTTP_200_OK)
+async def save_upload(payload: UploadPayload):
+    # TODO
+    raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED)

@@ -1,5 +1,7 @@
 import asyncio
 import io
+import os
+import shutil
 from pathlib import Path
 from typing import Tuple, List
 
@@ -13,20 +15,24 @@ class FileTooLargeError(Exception):
     pass
 
 
+SEM = asyncio.Semaphore(int(os.getenv("MAX_CONCURRENT_IO", 10)))
+
+
 async def write_file(file: UploadFile, path: Path, max_file_size: int) -> bytes:
-    path.parent.mkdir(parents=True, exist_ok=True)
+    async with SEM:
+        path.parent.mkdir(parents=True, exist_ok=True)
 
-    data = bytearray()
-    async with aiofiles.open(path, "wb") as f:
-        while chunk := await file.read(1024 * 1024):
-            data.extend(chunk)
-            await f.write(chunk)
-            if len(data) > max_file_size:
-                await f.close()
-                path.unlink(missing_ok=True)
-                raise FileTooLargeError(f"File exceeds max file size: '{file.filename}'")
+        data = bytearray()
+        async with aiofiles.open(path, "wb") as f:
+            while chunk := await file.read(1024 * 1024):
+                data.extend(chunk)
+                await f.write(chunk)
+                if len(data) > max_file_size:
+                    await f.close()
+                    path.unlink(missing_ok=True)
+                    raise FileTooLargeError(f"File exceeds max file size: '{file.filename}'")
 
-    return bytes(data)
+        return bytes(data)
 
 
 async def write_files(files: List[Tuple[UploadFile, Path]], max_file_size: int) -> List[bytes]:
@@ -35,15 +41,14 @@ async def write_files(files: List[Tuple[UploadFile, Path]], max_file_size: int) 
 
 
 async def delete_file(path: Path) -> bool:
-    try:
-        await aiofiles.os.remove(path)
-        return True
-
-    except FileNotFoundError:
-        return True
-
-    except Exception:
-        return False
+    async with SEM:
+        try:
+            await aiofiles.os.remove(path)
+            return True
+        except FileNotFoundError:
+            return True
+        except Exception:
+            return False
 
 
 async def delete_files(paths: List[Path]) -> List[bool]:
@@ -51,8 +56,20 @@ async def delete_files(paths: List[Path]) -> List[bool]:
 
 
 async def load_image_from_bytes(b: bytes) -> Image.Image:
-    return await asyncio.to_thread(Image.open, io.BytesIO(b))
+    async with SEM:
+        return await asyncio.to_thread(Image.open, io.BytesIO(b))
 
 
 async def load_images_from_bytes(bytes_list: List[bytes]) -> List[Image.Image]:
     return await asyncio.gather(*(load_image_from_bytes(b) for b in bytes_list))
+
+
+async def move_file(src: Path, dst: Path):
+    async with SEM:
+        await asyncio.to_thread(shutil.move, src, dst)
+
+
+async def move_files(files, dest_dir):
+    Path(dest_dir).mkdir(parents=True, exist_ok=True)
+    tasks = [move_file(f, Path(dest_dir) / f.name) for f in files]
+    await asyncio.gather(*tasks)

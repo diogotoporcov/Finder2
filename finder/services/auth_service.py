@@ -1,4 +1,3 @@
-# finder/services/auth_service.py
 import datetime as dt
 import uuid
 
@@ -67,6 +66,8 @@ class AuthService:
 
         db.add(user)
         db.commit()
+        db.refresh(user)
+        return user
 
     @classmethod
     def login(cls, db: Session, username: str, password: str):
