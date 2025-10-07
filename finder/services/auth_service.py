@@ -66,8 +66,6 @@ class AuthService:
 
         db.add(user)
         db.commit()
-        db.refresh(user)
-        return user
 
     @classmethod
     def login(cls, db: Session, username: str, password: str):
