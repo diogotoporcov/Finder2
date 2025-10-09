@@ -32,8 +32,8 @@ class TokenOut(BaseModel):
     "/register",
     status_code=status.HTTP_201_CREATED,
 )
-def register(body: RegisterIn, db: Session = Depends(get_db)):
-    AuthService.register(db, body.username, str(body.email), body.password)
+def register(credentials: RegisterIn, db: Session = Depends(get_db)):
+    AuthService.register(db, credentials.username, str(credentials.email), credentials.password)
 
 
 @router.post(
