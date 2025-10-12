@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from finder.db.session import get_db
-from finder.services.auth_service import AuthService
-from finder.utils.security import ACCESS_TTL_MIN
+from finder.services.auth_service import AuthService, ACCESS_TTL_MIN
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
