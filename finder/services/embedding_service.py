@@ -1,4 +1,3 @@
-import os
 from typing import List
 
 import numpy as np
@@ -6,10 +5,10 @@ import tritonclient.grpc as grpcclient
 from PIL import Image
 from tritonclient.grpc import InferenceServerClient, InferInput, InferRequestedOutput
 
+from finder.config import config
 from finder.services.singleton_base_service import SingletonBaseService
 from finder.utils.preprocess import preprocess_many
 
-TRITON_URL = os.getenv("TRITON_URL", "localhost:8001")
 MODEL_NAME = "embedder"
 INPUT_NAME = "INPUT"
 OUTPUT_NAME = "EMBEDDING"
@@ -21,7 +20,7 @@ class EmbeddingService(SingletonBaseService):
             return
 
         self.client: InferenceServerClient = grpcclient.InferenceServerClient(
-            url=TRITON_URL, verbose=False
+            url=config.TRITON_URL, verbose=False
         )
 
         self._initialized = True

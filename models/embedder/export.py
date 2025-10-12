@@ -4,8 +4,6 @@ import torch
 import torch.nn as nn
 import clip
 
-from finder.utils.types import DeviceType
-
 path = Path("./models/embedder/1/model.onnx")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"

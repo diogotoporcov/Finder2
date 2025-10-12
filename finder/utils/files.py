@@ -1,21 +1,22 @@
 import asyncio
 import io
-import os
 import shutil
 from pathlib import Path
 from typing import Tuple, List, Optional
 
 import aiofiles
 import aiofiles.os
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from fastapi import UploadFile
+
+from finder.config import config
 
 
 class FileTooLargeError(Exception):
     pass
 
 
-SEM = asyncio.Semaphore(int(os.getenv("MAX_CONCURRENT_IO")))
+SEM = asyncio.Semaphore(config.MAX_CONCURRENT_IO)
 
 
 async def read_file_from_upload_file(file: UploadFile, max_file_size: int) -> bytes:
@@ -82,13 +83,23 @@ async def delete_files(paths: List[Path]) -> List[bool]:
     return await asyncio.gather(*(delete_file(p) for p in paths))
 
 
-async def load_image_from_bytes(b: bytes) -> Image.Image:
+async def load_image_from_bytes(b: bytes, name: Optional[str] = None) -> Image.Image:
     async with SEM:
-        return await asyncio.to_thread(Image.open, io.BytesIO(b))
+        try:
+            image = await asyncio.to_thread(Image.open, io.BytesIO(b))
+            await asyncio.to_thread(image.load)
+            return image
+
+        except UnidentifiedImageError:
+            raise UnidentifiedImageError(name)
 
 
-async def load_images_from_bytes(bytes_list: List[bytes]) -> List[Image.Image]:
-    return await asyncio.gather(*(load_image_from_bytes(b) for b in bytes_list))
+async def load_images_from_bytes(bytes_list: List[bytes], names: Optional[List[str]] = None) -> List[Optional[Image.Image]]:
+    if names is None:
+        names = [None] * len(bytes_list)
+    return await asyncio.gather(
+        *(load_image_from_bytes(b, n) for b, n in zip(bytes_list, names))
+    )
 
 
 async def move_file(src: Path, dst: Path):

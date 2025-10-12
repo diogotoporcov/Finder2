@@ -2,6 +2,6 @@
 /.idea/
 **/pycache
 **/__pycache__
-**/*.onnx
 merger.ignore
 .env
+**/*.onnx

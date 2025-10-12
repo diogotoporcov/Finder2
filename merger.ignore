@@ -3,13 +3,7 @@
 pycache
 *.ignore
 .venv
-javascript.py
-flutter.py
-python.py
-self_scan.py
 __pycache__
-merge.txt
-README.md
 images/
 .pytest_cache
 *.enc
@@ -17,4 +11,3 @@ images/
 test.py
 finder2.txt
 **/*.onnx
-expired_uploads_janitor_service.py

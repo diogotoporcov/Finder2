@@ -16,9 +16,9 @@ pydantic
 pydantic[email]
 sqlalchemy
 alembic
+asyncpg
 psycopg2
 pgvector
-beautifulsoup4
 
 # Authentication / Security
 python-jose[cryptography]
