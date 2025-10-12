@@ -52,7 +52,7 @@ Finder is an image database management and similarity search service. It provide
 | **PostgreSQL**            | ≥14            | Tested in version 17.6                                                                     |
 | **pgvector**              | Latest         | [Installation guide](https://github.com/pgvector/pgvector?tab=readme-ov-file#installation) |
 | **Docker**                | Latest         | Needed for Triton container                                                                |
-| **CUDA Toolkit**          | 12.8           | Required only if using GPU.)                                                               |
+| **CUDA Toolkit**          | 12.8           | Required only if using GPU.                                                                |
 | **PyTorch / TorchVision** | CUDA-matched   | See compatibility below                                                                    |
 | **NVIDIA Triton Server**  | 25.05          | See compatibility below                                                                    |
 
