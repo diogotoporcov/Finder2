@@ -7,7 +7,7 @@
 [![NVIDIA Triton Server](https://img.shields.io/badge/NVIDIA%20Triton%20Server-ready-76b900.svg)](https://developer.nvidia.com/nvidia-triton-inference-server)
 
 
-Finder is an image database management and similarity search service. It provides secure upload, storage, and retrieval of image assets, with duplicate detection powered by perceptual hashing and vector embeddings. The system integrates with PostgreSQL + pgvector for efficient similarity queries and uses NVIDIA Triton Inference Server to generate normalized embeddings through a deep learning model.
+Finder v2 is a highly efficient image management system designed for organizing, storing, and preventing duplicate images in large databases. It leverages advanced techniques like visual feature extraction and semantic search using deep learning models to identify and prevent duplicates across multiple layers: SHA-256, pHash, and embedding cosine similarity. The system offers seamless image upload, storage, and retrieval with a strong focus on performance and scalability.
 
 ---
 
