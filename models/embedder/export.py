@@ -8,7 +8,7 @@ from finder.utils.types import DeviceType
 
 path = Path("./models/embedder/1/model.onnx")
 
-device = DeviceType.AUTO
+device = "cuda" if torch.cuda.is_available() else "cpu"
 model, preprocess = clip.load("ViT-B/32", device=device)
 model.float()
 model.eval()

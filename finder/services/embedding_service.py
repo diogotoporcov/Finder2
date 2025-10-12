@@ -10,9 +10,9 @@ from finder.services.singleton_base_service import SingletonBaseService
 from finder.utils.preprocess import preprocess_many
 
 TRITON_URL = os.getenv("TRITON_URL", "localhost:8001")
-MODEL_NAME = os.getenv("TRITON_MODEL", "embedder")
-INPUT_NAME = os.getenv("TRITON_INPUT", "INPUT")  # FP32 [N,3,224,224]
-OUTPUT_NAME = os.getenv("TRITON_OUTPUT", "EMBEDDING")  # FP32 [N,512]
+MODEL_NAME = "embedder"
+INPUT_NAME = "INPUT"
+OUTPUT_NAME = "EMBEDDING"
 
 
 class EmbeddingService(SingletonBaseService):
@@ -29,11 +29,10 @@ class EmbeddingService(SingletonBaseService):
     def is_running(self) -> bool:
         try:
             return (
-                    self.client.is_server_live()
-                    and self.client.is_server_ready()
-                    and self.client.is_model_ready(MODEL_NAME)
+                self.client.is_server_live()
+                and self.client.is_server_ready()
+                and self.client.is_model_ready(MODEL_NAME)
             )
-
         except Exception:
             return False
 
@@ -48,5 +47,4 @@ class EmbeddingService(SingletonBaseService):
 
     async def embed(self, images: List[Image.Image]) -> np.ndarray[np.float32]:
         batch = await preprocess_many(images)
-
-        return self._infer_batch(batch)  # [N,D]
+        return self._infer_batch(batch)

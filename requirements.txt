@@ -1,30 +1,36 @@
-alembic
-psycopg2
-aiofiles
-imagehash
-pydantic
-pydantic[email]
-starlette
+# Core
 fastapi
+starlette
 uvicorn
 watchfiles
 python-multipart
+aiofiles
+python-dotenv
+humanfriendly
+
+# Data & Models
 numpy
 pillow
+imagehash
+pydantic
+pydantic[email]
 sqlalchemy
+alembic
+psycopg2
 pgvector
+beautifulsoup4
 
+# Authentication / Security
+python-jose[cryptography]
+argon2-cffi
+pyjwt
+
+# Embedding
 --extra-index-url https://download.pytorch.org/whl/cu128
 torch==2.8.0+cu128
 torchvision==0.23.0+cu128
-
 git+https://github.com/openai/CLIP.git
-
 tritonclient[grpc]
 onnx
 onnxscript
 onnxruntime
-
-python-jose[cryptography]
-argon2-cffi
-pyjwt

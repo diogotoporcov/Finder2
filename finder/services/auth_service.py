@@ -1,6 +1,8 @@
 import datetime as dt
+import os
 import uuid
 
+from argon2 import PasswordHasher
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from fastapi import HTTPException, status, Depends
@@ -10,12 +12,16 @@ from sqlalchemy.orm import Session
 from finder.db.models.user import User
 from finder.db.models.refresh_token import RefreshToken
 from finder.db.session import get_db
-from finder.utils.security import (
-    ph, JWT_SECRET, JWT_ALG, ACCESS_TTL_MIN, REFRESH_TTL_DAYS
-)
-
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+
+JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_ALG = os.getenv("JWT_ALG", "HS512")
+ACCESS_TTL_MIN = int(os.getenv("ACCESS_TTL_MIN"))
+REFRESH_TTL_DAYS = int(os.getenv("REFRESH_TTL_DAYS"))
+
+ph = PasswordHasher()
 
 
 class AuthService:
@@ -58,6 +64,7 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Username or email is already in use."
             )
+
         user = User(
             username=username,
             email=email,
@@ -69,7 +76,14 @@ class AuthService:
 
     @classmethod
     def login(cls, db: Session, username: str, password: str):
-        user = db.scalar(select(User).where((User.username == username) | (User.email == username)))
+        import hashlib
+        import datetime as dt
+        from jose import jwt
+
+        user = db.scalar(
+            select(User)
+            .where(User.username == username)
+        )
         if not user or not cls.verify_password(password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -78,10 +92,13 @@ class AuthService:
 
         access = cls.mint_access(str(user.id))
         refresh = cls.mint_refresh(str(user.id))
+
         payload = jwt.get_unverified_claims(refresh)
+        hashed_jti = hashlib.sha256(payload["jti"].encode()).hexdigest()
+
         db.add(RefreshToken(
             user_id=user.id,
-            jti=payload["jti"],
+            jti_hash=hashed_jti,
             expires_at=dt.datetime.fromtimestamp(payload["exp"], tz=dt.timezone.utc)
         ))
 

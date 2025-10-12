@@ -3,7 +3,7 @@ import io
 import os
 import shutil
 from pathlib import Path
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
 import aiofiles
 import aiofiles.os
@@ -15,10 +15,10 @@ class FileTooLargeError(Exception):
     pass
 
 
-SEM = asyncio.Semaphore(int(os.getenv("MAX_CONCURRENT_IO", 10)))
+SEM = asyncio.Semaphore(int(os.getenv("MAX_CONCURRENT_IO")))
 
 
-async def read_file(file: UploadFile, max_file_size: int) -> bytes:
+async def read_file_from_upload_file(file: UploadFile, max_file_size: int) -> bytes:
     data = bytearray()
     while chunk := await file.read(1024 * 1024):
         data.extend(chunk)
@@ -28,8 +28,8 @@ async def read_file(file: UploadFile, max_file_size: int) -> bytes:
     return bytes(data)
 
 
-async def read_files(files: List[UploadFile], max_file_size: int) -> List[bytes]:
-    tasks = [read_file(file, max_file_size) for file in files]
+async def read_files_from_upload_file(files: List[UploadFile], max_file_size: int) -> List[bytes]:
+    tasks = [read_file_from_upload_file(file, max_file_size) for file in files]
     return await asyncio.gather(*tasks)
 
 
@@ -100,3 +100,9 @@ async def move_files(files, dest_dir):
     Path(dest_dir).mkdir(parents=True, exist_ok=True)
     tasks = [move_file(f, Path(dest_dir) / f.name) for f in files]
     await asyncio.gather(*tasks)
+
+
+async def read_file(path: Path) -> Optional[bytes]:
+    async with SEM:
+        async with aiofiles.open(path, "rb") as f:
+            return await f.read()
