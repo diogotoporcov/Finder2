@@ -89,7 +89,7 @@ async def get_images(
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def upload(
         files: List[UploadFile] = File(...),
-        target_collection: uuid.UUID | Literal["DEFAULT"] = Query("DEFAULT"),
+        target_collection_id: uuid.UUID | Literal["DEFAULT"] = Query("DEFAULT"),
         detect_duplicates: bool = Query(False),
         db: AsyncSession = Depends(get_db),
         user: User = Depends(AuthService.get_current_user),
@@ -112,10 +112,10 @@ async def upload(
             )
 
     stmt = sa.select(Collection.id).where(Collection.owner_id == user.id)
-    if target_collection == "DEFAULT":
+    if target_collection_id == "DEFAULT":
         stmt = stmt.where(Collection.is_default.is_(True))
     else:
-        stmt = stmt.where(Collection.id == target_collection)
+        stmt = stmt.where(Collection.id == target_collection_id)
 
     collection_id: uuid.UUID = await db.scalar(stmt)
     if not collection_id:

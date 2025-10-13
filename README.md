@@ -193,7 +193,7 @@ pip install -r requirements.txt
 After installing dependencies, run the following command from the root directory to export the model as an ONNX file:
 
 ```bash
-python ./models/embedder/export.py
+python ./scripts/export_onnx_model.py
 ```
 
 This will export the model as an ONNX file, which is necessary for running the image embedding process through the Triton server.
@@ -287,13 +287,13 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8080
 
 ### Images (`/images`)
 
-| Method   | Path                 | Description                           | Input                                                                                                                                    |
-|----------|----------------------|---------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET`    | `/images/{image_id}` | Retrieve an image                     |                                                                                                                                          |
-| `GET`    | `/images/`           | List all images in user's collections |                                                                                                                                          |
-| `POST`   | `/images/`           | Upload new images                     | **Body**: `files: List[UploadFile]` <br> **Query**: `target_collection: Union[uuid.UUID, Literal['DEFAULT']]`, `detect_duplicates: bool` |
-| `PATCH`  | `/images/{image_id}` | Update image metadata (tags)          | **Body**: `tags: Optional[List[str]]`                                                                                                    |
-| `DELETE` | `/images/{image_id}` | Delete an image                       |                                                                                                                                          |
+| Method   | Path                 | Description                           | Input                                                                                                                                       |
+|----------|----------------------|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET`    | `/images/{image_id}` | Retrieve an image                     |                                                                                                                                             |
+| `GET`    | `/images/`           | List all images in user's collections |                                                                                                                                             |
+| `POST`   | `/images/`           | Upload new images                     | **Body**: `files: List[UploadFile]` <br> **Query**: `target_collection_id: Union[uuid.UUID, Literal['DEFAULT']]`, `detect_duplicates: bool` |
+| `PATCH`  | `/images/{image_id}` | Update image metadata (tags)          | **Body**: `tags: Optional[List[str]]`                                                                                                       |
+| `DELETE` | `/images/{image_id}` | Delete an image                       |                                                                                                                                             |
 
 
 ---
