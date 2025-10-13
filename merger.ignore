@@ -11,3 +11,4 @@ images/
 test.py
 finder2.txt
 **/*.onnx
+storage/

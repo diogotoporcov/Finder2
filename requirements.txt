@@ -5,6 +5,7 @@ uvicorn
 watchfiles
 python-multipart
 aiofiles
+filetype
 python-dotenv
 humanfriendly
 

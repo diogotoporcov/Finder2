@@ -10,17 +10,11 @@ load_dotenv()
 
 
 class Config(BaseModel):
-    # Images
-    DB_IMAGE: str
-    TRITON_IMAGE: str
-    FINDER_IMAGE: str
-
     # Database
     DB_HOST: str
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    PGDATA: str
     POSTGRES_PORT: int
     DATABASE_URL: str
 
@@ -35,6 +29,11 @@ class Config(BaseModel):
     MAX_FILE_SIZE: int
     MAX_UPLOAD_FILES: int
     STORAGE_PATH: Path
+    IMPORTS_PATH: Path
+
+    # Similarity Parameters
+    PHASH_BIT_DIFF_TOLERANCE: int
+    EMBEDDING_SIMILARITY_THRESHOLD: float
 
     # Triton
     TRITON_HOST: str
@@ -52,15 +51,10 @@ class Config(BaseModel):
 
 
 config = Config(
-    DB_IMAGE=os.environ["DB_IMAGE"],
-    TRITON_IMAGE=os.environ["TRITON_IMAGE"],
-    FINDER_IMAGE=os.environ["FINDER_IMAGE"],
-
     DB_HOST=os.environ["DB_HOST"],
     POSTGRES_DB=os.environ["POSTGRES_DB"],
     POSTGRES_USER=os.environ["POSTGRES_USER"],
     POSTGRES_PASSWORD=os.environ["POSTGRES_PASSWORD"],
-    PGDATA=os.environ["PGDATA"],
     POSTGRES_PORT=int(os.environ["POSTGRES_PORT"]),
     DATABASE_URL=str(AnyUrl(os.environ["DATABASE_URL"])),
 
@@ -73,6 +67,10 @@ config = Config(
     MAX_FILE_SIZE=humanfriendly.parse_size(os.environ["MAX_FILE_SIZE"]),
     MAX_UPLOAD_FILES=int(os.environ["MAX_UPLOAD_FILES"]),
     STORAGE_PATH=Path(os.environ["STORAGE_PATH"]),
+    IMPORTS_PATH=Path(os.environ["IMPORTS_PATH"]),
+
+    PHASH_BIT_DIFF_TOLERANCE=int(os.environ["PHASH_BIT_DIFF_TOLERANCE"]),
+    EMBEDDING_SIMILARITY_THRESHOLD=float(os.environ["EMBEDDING_SIMILARITY_THRESHOLD"]),
 
     TRITON_HOST=os.environ["TRITON_HOST"],
     TRITON_HTTP_PORT=int(os.environ["TRITON_HTTP_PORT"]),

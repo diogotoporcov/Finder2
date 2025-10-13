@@ -20,7 +20,8 @@ Finder v2 is a highly efficient image management system designed for organizing,
 5. [Running Finder v2](#running-finder-v2)
 6. [Endpoints](#rest-api-endpoints)
 7. [Future Plans](#future-plans)
-8. [License](#license)
+8. [Importing Multiple Images](#importing-multiple-images)
+9. [License](#license)
 
 ---
 
@@ -185,7 +186,6 @@ Then install all dependencies:
 pip install -r requirements.txt
 ```
 
-
 ---
 
 ### 5. Export clip model to ONNX
@@ -193,7 +193,7 @@ pip install -r requirements.txt
 After installing dependencies, run the following command from the root directory to export the model as an ONNX file:
 
 ```bash
-python ./scripts/export_onnx_model.py
+python -m scripts.export_onnx_model
 ```
 
 This will export the model as an ONNX file, which is necessary for running the image embedding process through the Triton server.
@@ -215,12 +215,12 @@ alembic upgrade head
 > **Note:** Ensure Docker is running and the correct `tritonserver` version is used for your setup. \
 Refer to **[Picking Correct NVIDIA Triton Version](#picking-correct-nvidia-triton-version)** for guidance on selecting the right build for your system.
 
-> For CPU-only systems, replace `-py3` with `-py3-cpu`.
+> For CPU-only systems, remove `--gpus all` and replace `-py3` with `-py3-cpu`.
 
 **Linux / macOS**
 
 ```bash
-docker run --rm -it -p8000:8000 -p8001:8001 -p8002:8002 \
+docker run --gpus all --rm -it -p8000:8000 -p8001:8001 -p8002:8002 \
   -v "$(pwd)/models:/models" \
   nvcr.io/nvidia/tritonserver:25.05-py3 \
   tritonserver --model-repository=/models
@@ -228,8 +228,8 @@ docker run --rm -it -p8000:8000 -p8001:8001 -p8002:8002 \
 
 **Windows (PowerShell)**
 
-```powershell
-docker run --rm -it -p8000:8000 -p8001:8001 -p8002:8002 `
+```bash
+docker run --gpus all --rm -it -p8000:8000 -p8001:8001 -p8002:8002 `
   -v ${PWD}\models:/models `
   nvcr.io/nvidia/tritonserver:25.05-py3 `
   tritonserver --model-repository=/models
@@ -295,6 +295,26 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8080
 | `PATCH`  | `/images/{image_id}` | Update image metadata (tags)          | **Body**: `tags: Optional[List[str]]`                                                                                                       |
 | `DELETE` | `/images/{image_id}` | Delete an image                       |                                                                                                                                             |
 
+---
+
+## Importing Multiple Images
+
+Finder v2 includes a helper script for bulk image import.
+
+### Running the Importer
+
+Add all images you want to import to the system into the folder defined by `IMPORTS_PATH` in your [`.env`](.env) file.
+Then run:
+
+```bash
+python -m scripts.import_images --id "<UUID OF TARGET COLLECTION>" --prevent-duplicates --files_per_batch 64
+```
+
+> **Notes:** 
+> * To disable duplicate prevention, remove the `--prevent-duplicates` parameter.
+> * The number of images processed per batch can be configured using the `--files-per-batch` parameter.
+
+All files will be registered in the database and moved to their designated collection folders.
 
 ---
 

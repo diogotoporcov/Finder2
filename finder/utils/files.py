@@ -1,11 +1,13 @@
 import asyncio
 import io
 import shutil
+from itertools import repeat
 from pathlib import Path
 from typing import Tuple, List, Optional
 
 import aiofiles
 import aiofiles.os
+import filetype
 from PIL import Image, UnidentifiedImageError
 from fastapi import UploadFile
 
@@ -96,7 +98,7 @@ async def load_image_from_bytes(b: bytes, name: Optional[str] = None) -> Image.I
 
 async def load_images_from_bytes(bytes_list: List[bytes], names: Optional[List[str]] = None) -> List[Optional[Image.Image]]:
     if names is None:
-        names = [None] * len(bytes_list)
+        names = repeat(None, len(bytes_list))
     return await asyncio.gather(
         *(load_image_from_bytes(b, n) for b, n in zip(bytes_list, names))
     )
@@ -113,7 +115,26 @@ async def move_files(files, dest_dir):
     await asyncio.gather(*tasks)
 
 
-async def read_file(path: Path) -> Optional[bytes]:
+async def read_file(path: Path) -> bytes:
     async with SEM:
         async with aiofiles.open(path, "rb") as f:
             return await f.read()
+
+
+async def read_files(paths: List[Path]) -> List[bytes]:
+    tasks = [read_file(path) for path in paths]
+    return await asyncio.gather(*tasks)
+
+
+async def get_mime_type(path: Path) -> str:
+    async with SEM:
+        async with aiofiles.open(path, 'rb') as file:
+            header = await file.read(261)
+
+        kind = filetype.guess(header)
+        return kind.mime if kind else "application/octet-stream"
+
+
+async def get_mime_types(paths: List[Path]) -> List[str]:
+    tasks = [get_mime_type(path) for path in paths]
+    return await asyncio.gather(*tasks)

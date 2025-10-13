@@ -1,6 +1,5 @@
 import uuid
 import sqlalchemy as sa
-from pgvector.sqlalchemy import Vector
 
 from finder.db.base import Base
 

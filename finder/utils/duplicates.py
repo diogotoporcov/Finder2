@@ -5,6 +5,7 @@ import sqlalchemy as sa
 import sqlalchemy.dialects
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from finder.config import config
 from finder.db.models.image import Image
 from finder.db.models.image_fingerprint import ImageFingerprint
 
@@ -46,7 +47,7 @@ async def detect_duplicate_phash(
         owner_id: uuid.UUID,
         collection_id: uuid.UUID,
         image_id: uuid.UUID,
-        threshold: int = 5
+        bit_diff_tolerance: int = config.PHASH_BIT_DIFF_TOLERANCE
 ) -> Optional[uuid.UUID]:
     target_phash = (
         sa.select(ImageFingerprint.phash)
@@ -73,7 +74,7 @@ async def detect_duplicate_phash(
             Image.owner_id == owner_id,
             Image.collection_id == collection_id,
             Image.id != image_id,
-            bit_diff <= sa.literal(threshold, type_=sa.Integer),
+            bit_diff <= sa.literal(bit_diff_tolerance, type_=sa.Integer),
         )
         .limit(1)
     )
@@ -86,7 +87,7 @@ async def detect_duplicate_embedding(
         owner_id: uuid.UUID,
         collection_id: uuid.UUID,
         image_id: uuid.UUID,
-        threshold: float = 0.9
+        similarity_threshold: float = config.EMBEDDING_SIMILARITY_THRESHOLD
 ) -> Optional[uuid.UUID]:
     target_embedding = (
         sa.select(ImageFingerprint.embedding)
@@ -110,7 +111,7 @@ async def detect_duplicate_embedding(
             Image.owner_id == owner_id,
             Image.collection_id == collection_id,
             Image.id != image_id,
-            similarity >= sa.literal(threshold),
+            similarity >= sa.literal(similarity_threshold),
         )
         .limit(1)
     )

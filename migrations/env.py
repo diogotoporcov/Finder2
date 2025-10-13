@@ -83,8 +83,6 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
-
         context.configure(
             connection=connection, target_metadata=target_metadata, render_item=render_item
         )

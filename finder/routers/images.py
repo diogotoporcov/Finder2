@@ -98,7 +98,7 @@ async def upload(
     if not files or not files[0].filename:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "No files were provided.")
 
-    if len(files) > config.MAX_FILES:
+    if len(files) > config.MAX_UPLOAD_FILES:
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "Too many files uploaded.")
 
     if not embedder.is_running():
@@ -122,6 +122,7 @@ async def upload(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Collection not found.")
 
     upload_path = config.STORAGE_PATH / "collections" / str(user.id) / str(collection_id)
+    upload_path.mkdir(exist_ok=True, parents=True)
 
     file_contents = await read_files_from_upload_file(files, config.MAX_FILE_SIZE)
 
@@ -214,6 +215,8 @@ async def upload(
                 db.expunge(image_fingerprint)
 
         await db.commit()
+
+        print([upload_path / data.stored_filename for data in file_datas])
 
         await write_files_bytes([
             (data.file_content, upload_path / data.stored_filename)
