@@ -216,8 +216,6 @@ async def upload(
 
         await db.commit()
 
-        print([upload_path / data.stored_filename for data in file_datas])
-
         await write_files_bytes([
             (data.file_content, upload_path / data.stored_filename)
             for data in file_datas
