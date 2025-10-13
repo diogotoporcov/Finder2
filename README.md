@@ -202,7 +202,7 @@ This will export the model as an ONNX file, which is necessary for running the i
 
 ### 6. Run database migrations
 
-> **Note:** Ensure PostgreSQL and `pgvector` are installed.
+> **Note:** Ensure PostgreSQL and pgvector are installed and `vector` extension is enabled in the database.
 
 ```bash
 alembic upgrade head
