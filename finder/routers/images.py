@@ -205,6 +205,14 @@ async def upload(
                 detail={"message": "All files already exist in the target collection.", "duplicates": duplicate_map}
             )
 
+        for image in images:
+            if str(image.id) in duplicate_map:
+                db.expunge(image)
+
+        for image_fingerprint in image_fingerprints:
+            if str(image_fingerprint.image_id) in duplicate_map:
+                db.expunge(image_fingerprint)
+
         await db.commit()
 
         await write_files_bytes([
