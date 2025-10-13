@@ -195,7 +195,7 @@ if __name__ == '__main__':
                     "and stored in the database and file system."
     )
     parser.add_argument(
-        "--id",
+        "--collection_id",
         required=True,
         help="UUID of the target collection to import images into."
     )
