@@ -19,8 +19,8 @@ Finder v2 is a highly efficient image management system designed for organizing,
 4. [Running NVIDIA Triton Server](#running-nvidia-triton-server)
 5. [Running Finder v2](#running-finder-v2)
 6. [Endpoints](#rest-api-endpoints)
-7. [Future Plans](#future-plans)
-8. [Importing Multiple Images](#importing-multiple-images)
+7. [Importing Multiple Images](#importing-multiple-images)
+8. [Future Plans](#future-plans)
 9. [License](#license)
 
 ---
