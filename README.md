@@ -7,7 +7,7 @@
 [![NVIDIA Triton Server](https://img.shields.io/badge/NVIDIA%20Triton%20Server-ready-76b900.svg)](https://developer.nvidia.com/nvidia-triton-inference-server)
 
 
-Finder v2 is a highly efficient image management system designed for organizing, storing, and preventing duplicate images in large databases. It leverages advanced techniques like visual feature extraction and semantic search using deep learning models to identify and prevent duplicates across multiple layers: SHA-256, pHash, and embedding cosine similarity. The system offers seamless image upload, storage, and retrieval with a strong focus on performance and scalability.
+Finder v2 is a highly efficient image bank management API designed for organizing, storing, and preventing duplicate images in large databases. It leverages advanced techniques like visual feature extraction and semantic search using deep learning models to identify and prevent duplicates across multiple layers: SHA-256, pHash, and embedding cosine similarity. The system offers seamless image upload, storage, and retrieval with a strong focus on performance and scalability.
 
 ---
 
