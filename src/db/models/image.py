@@ -1,7 +1,7 @@
 import uuid
 import sqlalchemy as sa
 
-from finder.db.base import Base
+from src.db.base import Base
 
 
 class Image(Base):

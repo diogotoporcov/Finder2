@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from pgvector.sqlalchemy import Vector
-from finder.db.base import Base
+from src.db.base import Base
 
 
 class ImageFingerprint(Base):

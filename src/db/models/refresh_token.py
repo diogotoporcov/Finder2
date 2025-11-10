@@ -1,6 +1,6 @@
 import uuid, sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
-from finder.db.base import Base
+from src.db.base import Base
 
 
 class RefreshToken(Base):

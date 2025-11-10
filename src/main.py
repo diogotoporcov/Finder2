@@ -3,8 +3,8 @@ import contextlib
 from fastapi import FastAPI
 from fastapi.concurrency import run_in_threadpool
 
-from finder.routers import register_routers
-from finder.services.embedding_service import EmbeddingService
+from src.routers import register_routers
+from src.services.embedding_service import EmbeddingService
 
 
 @contextlib.asynccontextmanager

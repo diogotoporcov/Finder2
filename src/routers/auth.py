@@ -3,9 +3,9 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from finder.config import config
-from finder.db.session import get_db
-from finder.services.auth_service import AuthService
+from src.config import config
+from src.db.session import get_db
+from src.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

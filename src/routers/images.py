@@ -12,19 +12,19 @@ from fastapi import status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from finder.config import config
-from finder.db.models.collection import Collection
-from finder.db.models.duplicates import ImageDuplicate
-from finder.db.models.image import Image
-from finder.db.models.image_fingerprint import ImageFingerprint
-from finder.db.models.user import User
-from finder.db.session import get_db
-from finder.services.auth_service import AuthService
-from finder.services.embedding_service import EmbeddingService
-from finder.utils.duplicates import find_duplicate_sha256, find_duplicate_phash, find_duplicate_embedding
-from finder.utils.files import load_images_from_bytes, read_files_from_upload_file, write_files_bytes, delete_files, \
+from src.config import config
+from src.db.models.collection import Collection
+from src.db.models.duplicates import ImageDuplicate
+from src.db.models.image import Image
+from src.db.models.image_fingerprint import ImageFingerprint
+from src.db.models.user import User
+from src.db.session import get_db
+from src.services.auth_service import AuthService
+from src.services.embedding_service import EmbeddingService
+from src.utils.duplicates import find_duplicate_sha256, find_duplicate_phash, find_duplicate_embedding
+from src.utils.files import load_images_from_bytes, read_files_from_upload_file, write_files_bytes, delete_files, \
     read_file
-from finder.utils.hashing import sha256_many, phash_many
+from src.utils.hashing import sha256_many, phash_many
 
 router = APIRouter(prefix="/images", tags=["images"])
 

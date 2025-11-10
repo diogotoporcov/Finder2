@@ -2,7 +2,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 
-from finder.config import config
+from src.config import config
 
 DATABASE_URL = config.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 

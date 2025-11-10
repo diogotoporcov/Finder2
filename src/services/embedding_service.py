@@ -5,9 +5,9 @@ import tritonclient.grpc as grpcclient
 from PIL import Image
 from tritonclient.grpc import InferenceServerClient, InferInput, InferRequestedOutput
 
-from finder.config import config
-from finder.services.singleton_base_service import SingletonBaseService
-from finder.utils.preprocess import preprocess_many
+from src.config import config
+from src.services.singleton_base_service import SingletonBaseService
+from src.utils.preprocess import preprocess_many
 
 MODEL_NAME = "embedder"
 INPUT_NAME = "INPUT"

@@ -7,10 +7,10 @@ from sqlalchemy import event, Connection
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapper
 
-from finder.db.models.collection import Collection
-from finder.db.models.user import User
-from finder.db.session import get_db
-from finder.services.auth_service import AuthService
+from src.db.models.collection import Collection
+from src.db.models.user import User
+from src.db.session import get_db
+from src.services.auth_service import AuthService
 
 router = APIRouter(prefix="/users", tags=["users"])
 

@@ -2,7 +2,7 @@ import uuid
 from sqlalchemy import Column, String, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
 
-from finder.db.base import Base
+from src.db.base import Base
 
 
 class User(Base):

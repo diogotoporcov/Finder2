@@ -11,7 +11,7 @@ import filetype
 from PIL import Image, UnidentifiedImageError
 from fastapi import UploadFile
 
-from finder.config import config
+from src.config import config
 
 
 class FileTooLargeError(Exception):

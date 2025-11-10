@@ -5,9 +5,9 @@ import sqlalchemy as sa
 import sqlalchemy.dialects
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from finder.config import config
-from finder.db.models.image import Image
-from finder.db.models.image_fingerprint import ImageFingerprint
+from src.config import config
+from src.db.models.image import Image
+from src.db.models.image_fingerprint import ImageFingerprint
 
 
 async def find_duplicate_sha256(
