@@ -10,10 +10,10 @@ from jose import jwt, JWTError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from finder.config import config
-from finder.db.models.refresh_token import RefreshToken
-from finder.db.models.user import User
-from finder.db.session import get_db
+from src.config import config
+from src.db.models.refresh_token import RefreshToken
+from src.db.models.user import User
+from src.db.session import get_db
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 ph = PasswordHasher()
@@ -59,7 +59,7 @@ class AuthService:
         )
         if existing:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail="Username or email is already in use."
             )
 

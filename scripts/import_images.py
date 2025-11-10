@@ -6,15 +6,15 @@ from typing import List, Generator, TypeVar
 
 import sqlalchemy as sa
 
-from finder.config import config
-from finder.db.models.collection import Collection
-from finder.db.models.image import Image
-from finder.db.models.image_fingerprint import ImageFingerprint
-from finder.db.session import SessionLocal
-from finder.services.embedding_service import EmbeddingService
-from finder.utils.duplicates import detect_duplicate_sha256, detect_duplicate_phash, detect_duplicate_embedding
-from finder.utils.files import get_mime_types, read_files, load_images_from_bytes, write_files_bytes, delete_files
-from finder.utils.hashing import sha256_many, phash_many
+from src.config import config
+from src.db.models.collection import Collection
+from src.db.models.image import Image
+from src.db.models.image_fingerprint import ImageFingerprint
+from src.db.session import SessionLocal
+from src.services.embedding_service import EmbeddingService
+from src.utils.duplicates import find_duplicate_sha256, find_duplicate_phash, find_duplicate_embedding
+from src.utils.files import get_mime_types, read_files, load_images_from_bytes, write_files_bytes, delete_files
+from src.utils.hashing import sha256_many, phash_many
 
 T = TypeVar('T')
 
@@ -124,15 +124,15 @@ async def import_images(
             if prevent_duplicates:
                 print(f"[batch {idx}] duplicate_check start")
                 for path, image, fingerprint in zip(paths, images, fingerprints):
-                    dupe = await detect_duplicate_sha256(db, image.owner_id, image.collection_id, image.id)
+                    dupe = await find_duplicate_sha256(db, image.owner_id, image.collection_id, image.id)
                     dupe_type = "sha256" if dupe else None
 
                     if not dupe:
-                        dupe = await detect_duplicate_phash(db, image.owner_id, image.collection_id, image.id)
+                        dupe = await find_duplicate_phash(db, image.owner_id, image.collection_id, image.id)
                         dupe_type = "phash" if dupe else None
 
                     if not dupe:
-                        dupe = await detect_duplicate_embedding(db, image.owner_id, image.collection_id, image.id)
+                        dupe = await find_duplicate_embedding(db, image.owner_id, image.collection_id, image.id)
                         dupe_type = "embedding" if dupe else None
 
                     if dupe:

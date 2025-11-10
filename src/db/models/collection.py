@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from sqlalchemy import event, Connection, select
 from sqlalchemy.orm import Mapper, Session
 
-from finder.db.base import Base
+from src.db.base import Base
 
 
 class Collection(Base):

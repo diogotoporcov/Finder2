@@ -6,8 +6,8 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy import engine_from_config, text
 from sqlalchemy import pool
 
-from finder.db import Base
-from finder.config import config as finder_config
+from src.db import Base
+from src.config import config as finder_config
 
 
 def render_item(object_type: str, obj: Any, autogen_context) -> Union[str, Literal[False]]:

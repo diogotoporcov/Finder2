@@ -41,6 +41,8 @@ class Config(BaseModel):
     TRITON_GRPC_PORT: int
     TRITON_METRICS_PORT: int
     TRITON_URL: str
+    TRITON_WAIT_TIMEOUT: int
+    TRITON_WAIT_INTERVAL: float
 
     # FastAPI
     FASTAPI_HOST: str
@@ -77,6 +79,8 @@ config = Config(
     TRITON_GRPC_PORT=int(os.environ["TRITON_GRPC_PORT"]),
     TRITON_METRICS_PORT=int(os.environ["TRITON_METRICS_PORT"]),
     TRITON_URL=os.environ["TRITON_URL"],
+    TRITON_WAIT_TIMEOUT=int(os.environ.get("TRITON_WAIT_TIMEOUT", 60)),
+    TRITON_WAIT_INTERVAL=float(os.environ.get("TRITON_WAIT_INTERVAL", 2.0)),
 
     FASTAPI_HOST=os.environ["FASTAPI_HOST"],
     FASTAPI_PORT=int(os.environ["FASTAPI_PORT"]),

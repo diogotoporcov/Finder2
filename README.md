@@ -18,7 +18,7 @@ Finder v2 is a highly efficient image bank management API designed for organizin
 3. [Installation Guide](#finder-v2-installation-guide)
 4. [Running NVIDIA Triton Server](#running-nvidia-triton-server)
 5. [Running Finder v2](#running-finder-v2)
-6. [Endpoints](#rest-api-endpoints)
+6. [API Documentation](#api-documentation)
 7. [Importing Multiple Images](#importing-multiple-images)
 8. [Future Plans](#future-plans)
 9. [License](#license)
@@ -247,55 +247,39 @@ docker run --gpus all --rm -it -p8000:8000 -p8001:8001 -p8002:8002 `
 Start the application with:
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8080
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8080
 ```
 
 > **Note:** Access at: [http://localhost:8080](http://localhost:8080)
 
 ---
 
-## REST API Endpoints
+## API Documentation
 
-### Authentication (`/auth`)
+The full OpenAPI documentation is available at: [`docs/openapi.json`](docs/openapi.json).
 
-| Method | Path             | Description           | Input                                                         |
-|--------|:-----------------|-----------------------|---------------------------------------------------------------|
-| `POST` | `/auth/register` | Register a new user   | **Body**: `username: str`, `email: EmailStr`, `password: str` |
-| `POST` | `/auth/login`    | Login to get tokens   | **Body**: `username: str`, `password: str`                    |
-| `POST` | `/auth/refresh`  | Refresh the JWT token | **Body**: `refresh_token: str`                                |
+
+You can use this file directly with tools such as **Swagger UI**, **Redocly**, or any OpenAPI-compatible viewer.
 
 ---
 
-### Users (`/users`)
+### Live Documentation
 
-| Method   | Path               | Description             | Input                                                            |
-|----------|--------------------|-------------------------|------------------------------------------------------------------|
-| `PATCH`  | `/users/{user_id}` | Update user details     | **Body**: `username: Optional[str]`, `email: Optional[EmailStr]` |
-| `DELETE` | `/users/{user_id}` | Delete the user account |                                                                  |
+When the server is running, it automatically provides the same API documentation at:
 
----
+| Type             | URL                                                               | Description                                     |
+|------------------|-------------------------------------------------------------------|-------------------------------------------------|
+| **OpenAPI JSON** | [localhost:8080/openapi.json](http://localhost:8080/openapi.json) | File showing the full API structure and details |
+| **Swagger UI**   | [localhost:8080/docs](http://localhost:8080/docs)                 | Page where you can test and explore the API     |
+| **Redoc**        | [localhost:8080/redoc](http://localhost:8080/redoc)               | Easy-to-read version of the API documentation   |
 
-### Collections (`/collections`)
-
-| `Method` | Path                           | Description                   | Input                                                        |
-|----------|--------------------------------|-------------------------------|--------------------------------------------------------------|
-| `POST`   | `/collections/`                | Create a new collection       | **Body**: `name: str`, `tags: Optional[List[str]]`           |
-| `PATCH`  | `/collections/{collection_id}` | Update an existing collection | **Body**: `name: Optional[str]`, `tags: Optional[List[str]]` |
-| `DELETE` | `/collections/{collection_id}` | Delete a collection           |                                                              |
-
----
-
-### Images (`/images`)
-
-| Method   | Path                 | Description                           | Input                                                                                                                                       |
-|----------|----------------------|---------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET`    | `/images/{image_id}` | Retrieve an image                     |                                                                                                                                             |
-| `GET`    | `/images/`           | List all images in user's collections |                                                                                                                                             |
-| `POST`   | `/images/`           | Upload new images                     | **Body**: `files: List[UploadFile]` <br> **Query**: `target_collection_id: Union[uuid.UUID, Literal['DEFAULT']]`, `detect_duplicates: bool` |
-| `PATCH`  | `/images/{image_id}` | Update image metadata (tags)          | **Body**: `tags: Optional[List[str]]`                                                                                                       |
-| `DELETE` | `/images/{image_id}` | Delete an image                       |                                                                                                                                             |
-
----
+> **Note:** If you want to disable any or all of these documentation pages, you can uncomment from [`main.py`](src/main.py) file:
+> ```python
+> docs_url=None,
+> redoc_url=None,
+> openapi_url=None
+> ```
+> This prevents FastAPI from generating and serving the respective documentation routes.
 
 ## Importing Multiple Images
 
@@ -307,7 +291,7 @@ Add all images you want to import to the system into the folder defined by `IMPO
 Then run:
 
 ```bash
-python -m scripts.import_images --id "<UUID OF TARGET COLLECTION>" --prevent-duplicates --files_per_batch 64
+python -m scripts.import_images --collection_id "<UUID OF TARGET COLLECTION>" --prevent-duplicates --files_per_batch 64
 ```
 
 > **Notes:** 
