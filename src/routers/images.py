@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from PIL import UnidentifiedImageError
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Query, Response
 from fastapi import status
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, RootModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import config
@@ -45,10 +45,10 @@ class FileData:
     embedding: Optional[np.ndarray] = None
 
 
-class ImagesOut(BaseModel):
+class ImagesOut(RootModel[Dict[uuid.UUID, List[uuid.UUID]]]):
     """Mapping of collection IDs to image IDs."""
 
-    __root__: Dict[uuid.UUID, List[uuid.UUID]] = Field(
+    root: Dict[uuid.UUID, List[uuid.UUID]] = Field(
         ...,
         description="Map of collection ID to list of image IDs.",
         examples=[{
@@ -179,7 +179,7 @@ async def get_images(
     for image_id, collection in rows:
         collections_map[str(collection.id)].append(str(image_id))
 
-    return ImagesOut(__root__=dict(collections_map))
+    return ImagesOut(root=dict(collections_map))
 
 
 @router.post(
