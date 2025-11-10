@@ -304,11 +304,15 @@ All files will be registered in the database and moved to their designated colle
 
 # Future Plans
 
+### High Priority:
+* Update [`scripts/import_images.py`](scripts/import_images.py) with the new duplicate system.
+* Implement endpoint for the user to decide what to do with duplicates.
+
+### Low Priority:
 * Implement permissions to allow users to access collections belonging to other users.
 * Develop a user interface (web-based) for improved accessibility and interaction.
 * Integrate Docker and Kubernetes to streamline project management across multiple devices and environments.
 * Establish automated testing using pytest, with CI/CD integration via GitHub Actions to trigger tests after each commit.
-* Implement endpoint to decide what to do with duplicates.
 
 ---
 
