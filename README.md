@@ -307,9 +307,8 @@ All files will be registered in the database and moved to their designated colle
 * Implement permissions to allow users to access collections belonging to other users.
 * Develop a user interface (web-based) for improved accessibility and interaction.
 * Integrate Docker and Kubernetes to streamline project management across multiple devices and environments.
-* Enhance function documentation to improve code maintainability and clarity.
 * Establish automated testing using pytest, with CI/CD integration via GitHub Actions to trigger tests after each commit.
-* Develop a system to automatically detect and handle duplicate entries within the platform.
+* Implement endpoint to decide what to do with duplicates.
 
 ---
 
