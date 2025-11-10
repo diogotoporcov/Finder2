@@ -3,7 +3,7 @@ from typing import List, Optional
 
 import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models.collection import Collection
@@ -11,25 +11,99 @@ from src.db.models.user import User
 from src.db.session import get_db
 from src.services.auth_service import AuthService
 
-router = APIRouter(prefix="/collections", tags=["collections"])
+router = APIRouter(
+    prefix="/collections",
+    tags=["Collections"],
+)
 
 
 class CollectionCreate(BaseModel):
-    name: str
-    tags: Optional[List[str]] = None
+    """Payload to create a new collection."""
+
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=64,
+        description="Collection name.",
+        examples=["Cats"],
+    )
+
+    tags: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of tags.",
+        examples=[["sphynx", "2025", "tabby"]],
+    )
+
+
+class CollectionOut(BaseModel):
+    """Collection details."""
+
+    id: uuid.UUID = Field(
+        ...,
+        description="Collection ID.",
+    )
+
+    owner_id: uuid.UUID = Field(
+        ...,
+        description="Collection Owner ID.",
+    )
+
+    name: str = Field(
+        ...,
+        description="Collection name.",
+    )
+
+    tags: List[str] = Field(
+        default_factory=list,
+        description="Collection tags.",
+    )
+
+    model_config = ConfigDict(
+        from_attributes=True
+    )
 
 
 class CollectionUpdate(BaseModel):
-    name: Optional[str] = None
-    tags: Optional[List[str]] = None
+    """Payload to update an existing collection."""
+
+    name: Optional[str] = Field(
+        default=None,
+        min_length=1,
+        max_length=64,
+        description="New collection name.",
+        examples=["Dogs"],
+    )
+
+    tags: Optional[List[str]] = Field(
+        default=None,
+        description="New list of tags.",
+        examples=[["dachshund", "cute", "2013"]],
+    )
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=CollectionOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create collection",
+    description="Create a new collection for the authenticated user.",
+    responses={
+        201: {"description": "Collection created."},
+        400: {"description": "Collection with this name already exists."},
+        401: {"description": "Unauthorized."},
+    },
+)
 async def create_collection(
     collection_data: CollectionCreate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(AuthService.get_current_user),
-):
+) -> CollectionOut:
+    """
+    Create a collection owned by the authenticated user.
+
+    `name` must be unique per user.
+    """
+
     existing = await db.scalar(
         sa.select(Collection).where(
             Collection.owner_id == user.id,
@@ -51,16 +125,31 @@ async def create_collection(
     db.add(collection)
     await db.commit()
     await db.refresh(collection)
-    return collection
+    return CollectionOut.model_validate(collection)
 
 
-@router.patch("/{collection_id}", status_code=status.HTTP_200_OK)
+@router.patch(
+    "/{collection_id}",
+    status_code=status.HTTP_200_OK,
+    summary="Update collection",
+    description="Update name or tags of an existing collection.",
+    responses={
+        200: {"description": "Collection updated."},
+        400: {"description": "Invalid update (for example, forbidden name)."},
+        401: {"description": "Unauthorized."},
+        404: {"description": "Collection not found."},
+    },
+)
 async def update_collection(
     collection_id: uuid.UUID,
     collection_update: CollectionUpdate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(AuthService.get_current_user),
-):
+) -> CollectionOut:
+    """
+    Update a collection owned by the authenticated user.
+    """
+
     collection = await db.scalar(
         sa.select(Collection).where(
             Collection.id == collection_id,
@@ -75,20 +164,36 @@ async def update_collection(
 
     if collection_update.name is not None:
         collection.name = collection_update.name
+
     if collection_update.tags is not None:
         collection.tags = collection_update.tags
 
     await db.commit()
     await db.refresh(collection)
-    return collection
+    return CollectionOut(
+        id=collection.id,
+        owner_id=collection.owner_id,
+        name=collection.name,
+        tags=collection.tags
+    )
 
 
-@router.delete("/{collection_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{collection_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete collection",
+    description="Delete a collection owned by the authenticated user.",
+    responses={
+        204: {"description": "Collection deleted."},
+        401: {"description": "Unauthorized."},
+        404: {"description": "Collection not found."},
+    },
+)
 async def delete_collection(
     collection_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(AuthService.get_current_user),
-):
+) -> None:
     collection = await db.scalar(
         sa.select(Collection).where(
             Collection.id == collection_id,
@@ -101,4 +206,3 @@ async def delete_collection(
 
     await db.delete(collection)
     await db.commit()
-    return None

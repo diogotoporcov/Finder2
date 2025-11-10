@@ -59,7 +59,7 @@ class AuthService:
         )
         if existing:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail="Username or email is already in use."
             )
 
