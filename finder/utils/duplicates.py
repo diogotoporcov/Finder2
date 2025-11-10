@@ -10,7 +10,7 @@ from finder.db.models.image import Image
 from finder.db.models.image_fingerprint import ImageFingerprint
 
 
-async def detect_duplicate_sha256(
+async def find_duplicate_sha256(
         db: AsyncSession,
         owner_id: uuid.UUID,
         collection_id: uuid.UUID,
@@ -42,7 +42,7 @@ async def detect_duplicate_sha256(
     return await db.scalar(duplicate_query)
 
 
-async def detect_duplicate_phash(
+async def find_duplicate_phash(
         db: AsyncSession,
         owner_id: uuid.UUID,
         collection_id: uuid.UUID,
@@ -82,7 +82,7 @@ async def detect_duplicate_phash(
     return await db.scalar(duplicate_query)
 
 
-async def detect_duplicate_embedding(
+async def find_duplicate_embedding(
         db: AsyncSession,
         owner_id: uuid.UUID,
         collection_id: uuid.UUID,

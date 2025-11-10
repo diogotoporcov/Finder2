@@ -14,4 +14,3 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 register_routers(app)
-

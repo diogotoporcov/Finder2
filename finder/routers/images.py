@@ -2,7 +2,7 @@ import uuid
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Dict
 
 import numpy as np
 import sqlalchemy as sa
@@ -14,13 +14,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from finder.config import config
 from finder.db.models.collection import Collection
+from finder.db.models.duplicates import ImageDuplicate
 from finder.db.models.image import Image
 from finder.db.models.image_fingerprint import ImageFingerprint
 from finder.db.models.user import User
 from finder.db.session import get_db
 from finder.services.auth_service import AuthService
 from finder.services.embedding_service import EmbeddingService
-from finder.utils.duplicates import detect_duplicate_sha256, detect_duplicate_phash, detect_duplicate_embedding
+from finder.utils.duplicates import find_duplicate_sha256, find_duplicate_phash, find_duplicate_embedding
 from finder.utils.files import load_images_from_bytes, read_files_from_upload_file, write_files_bytes, delete_files, \
     read_file
 from finder.utils.hashing import sha256_many, phash_many
@@ -86,11 +87,15 @@ async def get_images(
     return dict(collections_map)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+class UploadOut(BaseModel):
+    files: Optional[List[uuid.UUID]]
+    duplicates: Optional[Dict[uuid.UUID, uuid.UUID]]
+
+
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=UploadOut)
 async def upload(
         files: List[UploadFile] = File(...),
         target_collection_id: uuid.UUID | Literal["DEFAULT"] = Query("DEFAULT"),
-        detect_duplicates: bool = Query(False),
         db: AsyncSession = Depends(get_db),
         user: User = Depends(AuthService.get_current_user),
         embedder: EmbeddingService = Depends(EmbeddingService.get_instance)
@@ -181,38 +186,26 @@ async def upload(
         db.add_all(image_fingerprints)
         await db.flush()
 
-        duplicate_map = {}
-        if detect_duplicates:
-            remaining = []
-            for data in file_datas:
-                dup = (
-                        await detect_duplicate_sha256(db, user.id, collection_id, data.uuid)
-                        or await detect_duplicate_phash(db, user.id, collection_id, data.uuid)
-                        or await detect_duplicate_embedding(db, user.id, collection_id, data.uuid)
-                )
-
-                if dup:
-                    duplicate_map[str(data.uuid)] = str(dup)
-
-                else:
-                    remaining.append(data)
-
-            file_datas = remaining
-
-        if not file_datas:
-            await db.rollback()
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail={"message": "All files already exist in the target collection.", "duplicates": duplicate_map}
+        duplicate_map: Dict[uuid.UUID, uuid.UUID] = {}
+        for data in file_datas:
+            dupe = (
+                    await find_duplicate_sha256(db, user.id, collection_id, data.uuid)
+                    or await find_duplicate_phash(db, user.id, collection_id, data.uuid)
+                    or await find_duplicate_embedding(db, user.id, collection_id, data.uuid)
             )
 
-        for image in images:
-            if str(image.id) in duplicate_map:
-                db.expunge(image)
+            if dupe:
+                duplicate_map[data.uuid] = dupe
 
-        for image_fingerprint in image_fingerprints:
-            if str(image_fingerprint.image_id) in duplicate_map:
-                db.expunge(image_fingerprint)
+        if duplicate_map:
+            dupes: List[ImageDuplicate] = []
+            for dupe_id, original_id in duplicate_map.items():
+                dupes.append(ImageDuplicate(
+                    image_id=dupe_id,
+                    original_image_id=original_id
+                ))
+
+            db.add_all(dupes)
 
         await db.commit()
 
@@ -221,17 +214,17 @@ async def upload(
             for data in file_datas
         ])
 
-        if detect_duplicates and duplicate_map:
+        if duplicate_map:
             return {
-                "status": "partial",
                 "files": [data.uuid for data in file_datas],
                 "duplicates": duplicate_map
             }
 
-        return {
-            "status": "created",
-            "files": [data.uuid for data in file_datas]
-        }
+        else:
+            return {
+                "files": [data.uuid for data in file_datas],
+                "duplicates": None
+            }
 
     except HTTPException:
         raise
