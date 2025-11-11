@@ -6,7 +6,7 @@ from typing import List
 from dotenv import load_dotenv
 import os
 
-load_dotenv("../.env")
+load_dotenv()
 
 
 class Config(BaseModel):
