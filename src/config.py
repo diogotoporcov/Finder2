@@ -1,12 +1,12 @@
 from pathlib import Path
 
 import humanfriendly
-from pydantic import BaseModel, AnyUrl
+from pydantic import BaseModel, AnyUrl, ConfigDict
 from typing import List
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv("../.env")
 
 
 class Config(BaseModel):
@@ -47,6 +47,7 @@ class Config(BaseModel):
     # FastAPI
     FASTAPI_HOST: str
     FASTAPI_PORT: int
+    FILE_CACHE_MAX_AGE: int
 
     # Async I/O
     MAX_CONCURRENT_IO: int
@@ -84,6 +85,7 @@ config = Config(
 
     FASTAPI_HOST=os.environ["FASTAPI_HOST"],
     FASTAPI_PORT=int(os.environ["FASTAPI_PORT"]),
+    FILE_CACHE_MAX_AGE=int(os.environ["FILE_CACHE_MAX_AGE"]),
 
     MAX_CONCURRENT_IO=int(os.environ["MAX_CONCURRENT_IO"]),
 )

@@ -11,6 +11,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException, Query, 
 from fastapi import status
 from pydantic import BaseModel, Field, ConfigDict, RootModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.requests import Request
 
 from src.config import config
 from src.db.models.collection import Collection
@@ -124,6 +125,7 @@ class UploadOut(BaseModel):
 )
 async def get_image(
     image_id: uuid.UUID,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(AuthService.get_current_user),
 ) -> Response:
@@ -137,6 +139,12 @@ async def get_image(
             detail="The requested file was not found, or you do not have permission from the owner to access it."
         )
 
+    etag = f'"{image.id}"'
+    if request.headers.get("if-none-match") == etag:
+        return Response(
+            status_code=status.HTTP_304_NOT_MODIFIED
+        )
+
     image_path = config.STORAGE_PATH / "collections" / str(image.owner_id) / str(image.collection_id) / str(image.stored_filename)
     try:
         bytes_ = await read_file(image_path)
@@ -146,7 +154,10 @@ async def get_image(
             detail="The requested file was not found."
         )
 
-    return Response(content=bytes_, media_type=image.mime_type)
+    response = Response(content=bytes_, media_type=image.mime_type)
+    response.headers["Cache-Control"] = f"private, max-age={config.FILE_CACHE_MAX_AGE}"
+    response.headers["ETag"] = etag
+    return response
 
 
 @router.get(
