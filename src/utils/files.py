@@ -3,7 +3,7 @@ import io
 import shutil
 from itertools import repeat
 from pathlib import Path
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Union
 
 import aiofiles
 import aiofiles.os
@@ -138,3 +138,43 @@ async def get_mime_type(path: Path) -> str:
 async def get_mime_types(paths: List[Path]) -> List[str]:
     tasks = [get_mime_type(path) for path in paths]
     return await asyncio.gather(*tasks)
+
+
+async def resize_image(
+    image: Image.Image,
+    size: Union[
+        Tuple[int, int],
+        Tuple[int, None],
+        Tuple[None, int]
+    ]
+) -> Image.Image:
+    width, height = size
+
+    if width is not None and height is None:
+        aspect = image.height / image.width
+        height = int(width * aspect)
+
+    elif height is not None and width is None:
+        aspect = image.width / image.height
+        width = int(height * aspect)
+
+    if width <= 0 or height <= 0:
+        raise ValueError("Invalid resize dimensions")
+
+    def _resize() -> Image.Image:
+        return image.resize((width, height), Image.Resampling.LANCZOS)
+
+    return await asyncio.to_thread(_resize)
+
+
+async def image_to_bytes(
+    image: Image.Image,
+    image_format: Optional[str]
+) -> bytes:
+    def _convert() -> bytes:
+        buffer = io.BytesIO()
+        print("!!!!!!!", image.format)
+        image.save(buffer, format=image_format or image.format or "JPEG")
+        return buffer.getvalue()
+
+    return await asyncio.to_thread(_convert)

@@ -24,7 +24,7 @@ from src.services.auth_service import AuthService
 from src.services.embedding_service import EmbeddingService
 from src.utils.duplicates import find_duplicate_sha256, find_duplicate_phash, find_duplicate_embedding
 from src.utils.files import load_images_from_bytes, read_files_from_upload_file, write_files_bytes, delete_files, \
-    read_file
+    read_file, image_to_bytes, resize_image, load_image_from_bytes
 from src.utils.hashing import sha256_many, phash_many
 
 router = APIRouter(
@@ -126,6 +126,10 @@ class UploadOut(BaseModel):
 async def get_image(
     image_id: uuid.UUID,
     request: Request,
+    width: int = Query(None, ge=1,
+                       description="Optional target width in pixels. Will be capped to the image's maximum width."),
+    height: int = Query(None, ge=1,
+                        description="Optional target height in pixels. Will be capped to the image's maximum height."),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(AuthService.get_current_user),
 ) -> Response:
@@ -147,14 +151,24 @@ async def get_image(
 
     image_path = config.STORAGE_PATH / "collections" / str(image.owner_id) / str(image.collection_id) / str(image.stored_filename)
     try:
-        bytes_ = await read_file(image_path)
+        image_bytes = await read_file(image_path)
     except (FileNotFoundError, PermissionError):
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
             detail="The requested file was not found."
         )
 
-    response = Response(content=bytes_, media_type=image.mime_type)
+    if width or height:
+        pil_image = await load_image_from_bytes(image_bytes)
+
+        format_ = pil_image.format
+        height = min(width or float("inf"), pil_image.width)
+        width = min(height or float("inf"), pil_image.height)
+
+        pil_image = await resize_image(pil_image, (height, width))
+        image_bytes = await image_to_bytes(pil_image, format_)
+
+    response = Response(content=image_bytes, media_type=image.mime_type)
     response.headers["Cache-Control"] = f"private, max-age={config.FILE_CACHE_MAX_AGE}"
     response.headers["ETag"] = etag
     return response
