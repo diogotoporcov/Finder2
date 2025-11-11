@@ -10,6 +10,8 @@ load_dotenv("../.env")
 
 
 class Config(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     # Database
     DB_HOST: str
     POSTGRES_DB: str
