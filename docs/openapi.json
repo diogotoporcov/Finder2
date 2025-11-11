@@ -344,6 +344,30 @@
               "format": "uuid",
               "title": "Image Id"
             }
+          },
+          {
+            "name": "width",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Optional target width in pixels. Will be capped to the image's maximum width.",
+              "title": "Width"
+            },
+            "description": "Optional target width in pixels. Will be capped to the image's maximum width."
+          },
+          {
+            "name": "height",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Optional target height in pixels. Will be capped to the image's maximum height.",
+              "title": "Height"
+            },
+            "description": "Optional target height in pixels. Will be capped to the image's maximum height."
           }
         ],
         "responses": {
