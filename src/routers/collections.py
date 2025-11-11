@@ -88,9 +88,9 @@ class CollectionUpdate(BaseModel):
     summary="Create collection",
     description="Create a new collection for the authenticated user.",
     responses={
-        201: {"description": "Collection created."},
-        400: {"description": "Collection with this name already exists."},
-        401: {"description": "Unauthorized."},
+        status.HTTP_201_CREATED: {"description": "Collection created."},
+        status.HTTP_400_BAD_REQUEST: {"description": "Collection with this name already exists."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
     },
 )
 async def create_collection(
@@ -112,7 +112,7 @@ async def create_collection(
     )
     if existing:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail="Collection with this name already exists."
         )
 
@@ -134,10 +134,10 @@ async def create_collection(
     summary="Update collection",
     description="Update name or tags of an existing collection.",
     responses={
-        200: {"description": "Collection updated."},
-        400: {"description": "Invalid update (for example, forbidden name)."},
-        401: {"description": "Unauthorized."},
-        404: {"description": "Collection not found."},
+        status.HTTP_200_OK: {"description": "Collection updated."},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid update (for example, forbidden name)."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
+        status.HTTP_404_NOT_FOUND: {"description": "Collection not found."},
     },
 )
 async def update_collection(
@@ -158,9 +158,11 @@ async def update_collection(
     )
 
     if not collection:
-        raise HTTPException(status_code=404, detail="Collection not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Collection not found.")
     if collection_update.name == "DEFAULT":
-        raise HTTPException(status_code=400, detail="Cannot rename collection to DEFAULT.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail="Cannot rename collection to DEFAULT.")
 
     if collection_update.name is not None:
         collection.name = collection_update.name
@@ -184,9 +186,9 @@ async def update_collection(
     summary="Delete collection",
     description="Delete a collection owned by the authenticated user.",
     responses={
-        204: {"description": "Collection deleted."},
-        401: {"description": "Unauthorized."},
-        404: {"description": "Collection not found."},
+        status.HTTP_204_NO_CONTENT: {"description": "Collection deleted."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
+        status.HTTP_404_NOT_FOUND: {"description": "Collection not found."},
     },
 )
 async def delete_collection(
@@ -202,7 +204,8 @@ async def delete_collection(
     )
 
     if not collection:
-        raise HTTPException(status_code=404, detail="Collection not found.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Collection not found.")
 
     await db.delete(collection)
     await db.commit()

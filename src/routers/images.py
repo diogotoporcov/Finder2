@@ -118,9 +118,9 @@ class UploadOut(BaseModel):
     summary="Get image",
     description="Retrieve an image owned by the authenticated user.",
     responses={
-        200: {"description": "Image returned as binary content."},
-        401: {"description": "Unauthorized."},
-        404: {"description": "Image not found or not accessible."},
+        status.HTTP_200_OK: {"description": "Image returned as binary content."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
+        status.HTTP_404_NOT_FOUND: {"description": "Image not found or not accessible."},
     },
 )
 async def get_image(
@@ -181,8 +181,8 @@ async def get_image(
     summary="List images",
     description="List all images grouped by collection for the authenticated user.",
     responses={
-        200: {"description": "Images listed by collection."},
-        401: {"description": "Unauthorized."},
+        status.HTTP_200_OK: {"description": "Images listed by collection."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
     },
 )
 async def get_images(
@@ -218,12 +218,12 @@ async def get_images(
         "Duplicate detection may be applied depending on configuration."
     ),
     responses={
-        201: {"description": "Images uploaded."},
-        400: {"description": "No files, invalid files, or bad input."},
-        401: {"description": "Unauthorized."},
-        413: {"description": "Too many files or files too large."},
-        415: {"description": "Unsupported media type."},
-        503: {"description": "Upload service not available."},
+        status.HTTP_201_CREATED: {"description": "Images uploaded."},
+        status.HTTP_400_BAD_REQUEST: {"description": "No files, invalid files, or bad input."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
+        status.HTTP_413_CONTENT_TOO_LARGE: {"description": "Too many files or files too large."},
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE: {"description": "Unsupported media type."},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {"description": "Upload service not available."},
     },
 )
 async def upload(
@@ -381,9 +381,9 @@ async def upload(
     summary="Update image",
     description="Update image metadata.",
     responses={
-        200: {"description": "Image updated."},
-        401: {"description": "Unauthorized."},
-        404: {"description": "Image not found."},
+        status.HTTP_200_OK: {"description": "Image updated."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
+        status.HTTP_404_NOT_FOUND: {"description": "Image not found."},
     },
 )
 async def update_image(
@@ -422,9 +422,9 @@ async def update_image(
     summary="Delete image",
     description="Delete an image owned by the authenticated user.",
     responses={
-        204: {"description": "Image deleted."},
-        401: {"description": "Unauthorized."},
-        404: {"description": "Image not found."},
+        status.HTTP_204_NO_CONTENT: {"description": "Image deleted."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
+        status.HTTP_404_NOT_FOUND: {"description": "Image not found."},
     },
 )
 async def delete_image(

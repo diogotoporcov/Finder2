@@ -33,6 +33,7 @@ class RegisterIn(BaseModel):
     password: str = Field(
         ...,
         min_length=8,
+        max_length=64,
         description="User password.",
         examples=["3w6mYtzE?D$d"],
     )
@@ -49,6 +50,7 @@ class LoginIn(BaseModel):
 
     password: str = Field(
         ...,
+        max_length=64,
         description="Plain-text password chosen during registration.",
         examples=["3w6mYtzE?D$d"],
     )
@@ -98,13 +100,13 @@ class TokenOut(BaseModel):
             "On success, no body is returned."
     ),
     responses={
-        201: {
+        status.HTTP_201_CREATED: {
             "description": "User registered successfully.",
         },
-        400: {
+        status.HTTP_400_BAD_REQUEST: {
             "description": "Invalid payload or weak password policy violation.",
         },
-        409: {
+        status.HTTP_409_CONFLICT: {
             "description": "Username or email already in use.",
         },
     },
@@ -132,13 +134,13 @@ async def register(
         "Returns a short-lived access token and a long-lived refresh token."
     ),
     responses={
-        200: {
+        status.HTTP_200_OK: {
             "description": "Authentication successful. Tokens returned.",
         },
-        400: {
+        status.HTTP_400_BAD_REQUEST: {
             "description": "Invalid request body.",
         },
-        401: {
+        status.HTTP_401_UNAUTHORIZED: {
             "description": "Invalid username or password.",
         },
     },
@@ -174,13 +176,13 @@ async def login(
         "If the refresh token is invalid, expired, or revoked, an error is returned."
     ),
     responses={
-        200: {
+        status.HTTP_200_OK: {
             "description": "New access token issued.",
         },
-        400: {
+        status.HTTP_400_BAD_REQUEST: {
             "description": "Invalid request body.",
         },
-        401: {
+        status.HTTP_401_UNAUTHORIZED: {
             "description": "Invalid, expired, or revoked refresh token.",
         },
     },

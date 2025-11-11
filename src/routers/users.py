@@ -62,9 +62,9 @@ class UserOut(BaseModel):
     summary="Update user",
     description="Update username or email of the authenticated user.",
     responses={
-        200: {"description": "User updated."},
-        400: {"description": "Invalid data."},
-        401: {"description": "Unauthorized."},
+        status.HTTP_200_OK: {"description": "User updated."},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid data."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
     },
 )
 async def update_user(
@@ -93,8 +93,8 @@ async def update_user(
     summary="Delete user",
     description="Delete the authenticated user account.",
     responses={
-        204: {"description": "User deleted."},
-        401: {"description": "Unauthorized."},
+        status.HTTP_204_NO_CONTENT: {"description": "User deleted."},
+        status.HTTP_401_UNAUTHORIZED: {"description": "Unauthorized."},
     },
 )
 async def delete_user(
