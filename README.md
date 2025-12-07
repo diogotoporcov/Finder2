@@ -1,3 +1,8 @@
+> ⚠️ **Notice: Project Deprecated**
+> This project is **no longer maintained** and is currently being **rewritten**. \
+> The new version is available at: **[https://github.com/diogotoporcov/FileManager](https://github.com/diogotoporcov/FileManager)** \
+> No further updates or support will be provided here.
+
 # Finder v2
 
 [![Python](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/)
